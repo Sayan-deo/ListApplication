@@ -5,6 +5,7 @@ const Todo = require('./models/Todo');
 
 const app = express();
 app.use(express.json());
+app.use(express.static('public'));
 
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/todoapp';
@@ -26,8 +27,8 @@ app.get('/todos', async (req, res) => {
 // POST /todos — create a new todo
 app.post('/todos', async (req, res) => {
   try {
-    const { title, completed } = req.body;
-    const newTodo = new Todo({ title, completed });
+    const { title, completed, dueDate } = req.body;
+    const newTodo = new Todo({ title, completed, dueDate });
     const savedTodo = await newTodo.save();
     res.status(201).json(savedTodo);
   } catch (err) {
@@ -49,10 +50,10 @@ app.get('/todos/:id', async (req, res) => {
 // PUT /todos/:id — update a single todo by id
 app.put('/todos/:id', async (req, res) => {
   try {
-    const { title, completed } = req.body;
+    const { title, completed, dueDate } = req.body;
     const updatedTodo = await Todo.findByIdAndUpdate(
       req.params.id,
-      { title, completed },
+      { title, completed, dueDate },
       { new: true, runValidators: true }
     );
     if (!updatedTodo) return res.status(404).json({ error: 'Todo not found' });
