@@ -1,15 +1,15 @@
-# Taskify - Premium Todo Application
+# Taskify - Todo Application
 
 A sleek, responsive, and interactive Todo List web application. Built with a modern glassmorphism UI and powered by a robust backend using Node.js, Express, and MongoDB.
 
-## ✨ Features
+##  Features
 
 - **Modern UI**: A beautifully crafted Light Mode theme using glassmorphism, vibrant gradients, and dynamic micro-animations.
 - **Task Management**: Create tasks, set due dates and times, and seamlessly mark them as complete (which automatically deletes them).
 - **Persistent Data**: All tasks are securely saved and retrieved from a MongoDB Atlas database.
 - **Responsive Design**: Works perfectly across mobile, tablet, and desktop viewports.
 
-## 🏗️ Architecture & Tech Stack
+##  Architecture & Tech Stack
 
 This application follows a classic 3-Tier Client-Server Architecture (MEN Stack + Vanilla Frontend).
 
@@ -17,7 +17,7 @@ This application follows a classic 3-Tier Client-Server Architecture (MEN Stack 
 - **Backend**: Node.js and Express.js (`server.js`).
 - **Database**: MongoDB (via Mongoose ODM).
 
-## 🚀 Getting Started
+##  Getting Started
 
 You can run this application directly via Node.js or using Docker.
 
@@ -66,7 +66,7 @@ Since a `Dockerfile` is included, you can easily containerize and run the app.
    ```
    The application will be accessible at `http://localhost:3000`.
 
-## 🔌 API Reference
+##  API Reference
 
 The Express backend exposes a RESTful API to interact with the tasks.
 
