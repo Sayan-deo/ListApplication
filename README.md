@@ -98,3 +98,154 @@ Updates an existing task by its ID.
 ### `DELETE /todos/:id`
 Deletes a task by its ID (triggered in the UI when the completion checkbox is clicked).
 - **Response (200 OK):** `{ "message": "Todo deleted successfully" }`
+
+## 🧪 API Testing with Postman
+
+A comprehensive Postman collection is included for testing all API endpoints with 30+ automated test cases.
+
+### Quick Start
+
+1. **Download Postman** from [postman.com](https://www.postman.com/downloads/)
+
+2. **Import the collection and environment**:
+   - Open Postman → Click **Import** button
+   - Import `Postman_Collection.json` (the test suite)
+   - Import `Postman_Environment.json` (the environment variables)
+
+3. **Start your server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Run the tests**:
+   - Click the **Runner** button in Postman
+   - Select the imported collection
+   - Click **Run** to execute all tests
+
+### Test Coverage
+
+The Postman collection includes tests for:
+
+- ✅ **GET /todos** - Retrieve all todos with response validation
+- ✅ **POST /todos (Valid)** - Create todo with success case
+- ✅ **POST /todos (Invalid)** - Create todo with error handling
+- ✅ **GET /todos/:id** - Retrieve single todo by ID
+- ✅ **GET /todos/:id (Invalid)** - Handle non-existent todos
+- ✅ **PUT /todos/:id** - Update todo with full data
+- ✅ **PUT /todos/:id (Invalid)** - Handle update errors
+- ✅ **PUT /todos/:id (Partial)** - Test partial updates
+- ✅ **DELETE /todos/:id** - Delete todo
+- ✅ **DELETE /todos/:id (Invalid)** - Handle delete errors
+
+### Test Features
+
+Each test includes:
+- **Status code validation** - Ensures correct HTTP status
+- **Response structure validation** - Verifies JSON format
+- **Data type checking** - Validates field types
+- **Response time checks** - Performance validation
+- **Environment variable usage** - Data sharing between requests
+- **Error message validation** - Proper error handling
+
+### Running Tests via CLI
+
+Use Newman (Postman's CLI tool) for CI/CD integration:
+
+```bash
+# Install Newman globally
+npm install -g newman
+
+# Run the collection
+newman run Postman_Collection.json \
+  -e Postman_Environment.json \
+  -r json,html \
+  --reporter-html-export results.html
+```
+
+### Detailed Testing Guide
+
+For complete documentation on:
+- Environment setup
+- How to modify test cases
+- CI/CD integration
+- Custom test creation
+- Troubleshooting
+
+See [POSTMAN_TESTING_GUIDE.md](./POSTMAN_TESTING_GUIDE.md)
+
+---
+
+## 🔄 CI/CD Integration
+
+### GitLab CI/CD Pipeline
+
+Automated API testing is configured to run on every merge request and commit to main/develop branches.
+
+**File**: `.gitlab-ci.yml`
+
+**Pipeline Features**:
+- ✅ Automatic test execution on every commit
+- ✅ MongoDB service integration
+- ✅ Parallel job execution
+- ✅ HTML & JSON test reports
+- ✅ Automatic retry on infrastructure failures
+- ✅ Code linting with ESLint
+- ✅ Unit test coverage reports
+
+**Pipeline Stages**:
+1. **Build** - Install dependencies & Newman CLI
+2. **Test** - Run Postman tests, linting, unit tests
+3. **Report** - Archive test results and HTML reports
+
+**How it Works**:
+- Starts MongoDB service
+- Launches the Todo API server
+- Runs all 30+ Postman test cases
+- Generates detailed HTML report
+- Reports results back to merge request
+
+**Example MR Status**:
+```
+✓ build:dependencies
+✓ test:api:postman (30/30 tests passed)
+✓ lint:eslint
+✓ test:unit
+✓ report:postman
+```
+
+### Run Tests Locally (Simulate CI)
+
+```bash
+# Start MongoDB locally
+docker run -d -p 27017:27017 mongo:6.0
+
+# Install dependencies
+npm install
+npm install -g newman
+
+# Start server
+npm start &
+
+# Run test collection
+newman run Postman_Collection.json \
+  -e Postman_Environment.json \
+  -g globals.json \
+  -r json,html \
+  --reporter-html-export postman-report.html
+```
+
+### View Pipeline Results
+
+1. Navigate to **CI/CD → Pipelines** in GitLab
+2. Click on your pipeline
+3. Download `postman-report.html` from artifacts
+4. View detailed test results in HTML format
+
+### For Complete GitLab CI/CD Documentation
+
+See [GITLAB_CICD_GUIDE.md](./GITLAB_CICD_GUIDE.md) for:
+- Detailed pipeline configuration
+- Environment setup
+- Troubleshooting
+- Advanced features
+- Performance optimization

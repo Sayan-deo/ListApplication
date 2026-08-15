@@ -1,0 +1,50 @@
+{
+  "id": "globals",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "enabled": true,
+      "type": "string"
+    },
+    {
+      "key": "timeout_ms",
+      "value": "5000",
+      "enabled": true,
+      "type": "number"
+    },
+    {
+      "key": "retry_count",
+      "value": "2",
+      "enabled": true,
+      "type": "number"
+    },
+    {
+      "key": "test_todo_title",
+      "value": "CI Test Todo",
+      "enabled": true,
+      "type": "string"
+    },
+    {
+      "key": "test_todo_due_date",
+      "value": "2026-12-31",
+      "enabled": true,
+      "type": "string"
+    },
+    {
+      "key": "env_type",
+      "value": "ci",
+      "enabled": true,
+      "type": "string"
+    },
+    {
+      "key": "timestamp",
+      "value": "{{$timestamp}}",
+      "enabled": true,
+      "type": "string"
+    }
+  ],
+  "_postman_variable_scope": "globals",
+  "_postman_exported_at": "2024-01-15T10:30:00.000Z",
+  "_postman_exported_using": "Postman/11.0.0"
+}

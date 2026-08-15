@@ -1,0 +1,566 @@
+{
+  "info": {
+    "name": "Todo API Test Suite",
+    "description": "Comprehensive test cases for Todo REST API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": null,
+  "item": [
+    {
+      "name": "Setup - Create Todo for Testing",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    const responseData = pm.response.json();",
+              "    pm.environment.set('todo_id', responseData._id);",
+              "    pm.environment.set('todo_title', responseData.title);",
+              "    console.log('Test Todo Created - ID: ' + responseData._id);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Todo Item\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-31\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "1. GET - Retrieve All Todos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check response status code",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test 2: Check response time",
+              "pm.test('Response time is less than 500ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);",
+              "});",
+              "",
+              "// Test 3: Check response is an array",
+              "pm.test('Response is an array', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});",
+              "",
+              "// Test 4: Check array structure (if not empty)",
+              "pm.test('Response contains valid todo objects', function () {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.length > 0) {",
+              "        jsonData.forEach(function(todo) {",
+              "            pm.expect(todo).to.have.property('_id');",
+              "            pm.expect(todo).to.have.property('title');",
+              "            pm.expect(todo).to.have.property('completed');",
+              "            pm.expect(todo.completed).to.be.a('boolean');",
+              "        });",
+              "    }",
+              "});",
+              "",
+              "// Test 5: Check Content-Type header",
+              "pm.test('Content-Type header is application/json', function () {",
+              "    pm.response.to.have.header('Content-Type');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/todos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. POST - Create New Todo (Valid Data)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 201 Created",
+              "pm.test('Status code is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// Test 2: Check response contains _id",
+              "pm.test('Response contains _id', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('_id');",
+              "    pm.expect(jsonData._id).to.be.a('string');",
+              "});",
+              "",
+              "// Test 3: Check title matches request",
+              "pm.test('Todo title matches request body', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.title).to.equal('Complete project documentation');",
+              "});",
+              "",
+              "// Test 4: Check completed defaults to false",
+              "pm.test('Completed field defaults to false', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.completed).to.equal(false);",
+              "});",
+              "",
+              "// Test 5: Check dueDate is present",
+              "pm.test('Due date is present in response', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('dueDate');",
+              "});",
+              "",
+              "// Test 6: Check createdAt timestamp exists",
+              "pm.test('CreatedAt timestamp is present', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('createdAt');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Complete project documentation\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. POST - Create Todo (Missing Required Field)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 400 Bad Request",
+              "pm.test('Status code is 400 for missing title', function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "// Test 2: Check error message is present",
+              "pm.test('Error message is present in response', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData.error).to.be.a('string');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. GET - Retrieve Single Todo by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 200",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test 2: Check response is an object",
+              "pm.test('Response is a single todo object', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('object');",
+              "});",
+              "",
+              "// Test 3: Check required properties exist",
+              "pm.test('Todo object has all required properties', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('_id');",
+              "    pm.expect(jsonData).to.have.property('title');",
+              "    pm.expect(jsonData).to.have.property('completed');",
+              "    pm.expect(jsonData).to.have.property('createdAt');",
+              "});",
+              "",
+              "// Test 4: Check _id matches the requested ID",
+              "pm.test('Returned todo ID matches requested ID', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData._id).to.equal(pm.environment.get('todo_id'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/todos/{{todo_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "{{todo_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. GET - Retrieve Todo with Invalid ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 404 Not Found",
+              "pm.test('Status code is 404 for invalid ID', function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "// Test 2: Check error message is present",
+              "pm.test('Error message indicates todo not found', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData.error).to.include('not found');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/todos/invalid_id_12345",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "invalid_id_12345"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. PUT - Update Todo (Valid Data)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 200",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test 2: Check updated title",
+              "pm.test('Todo title is updated', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.title).to.equal('Updated: Complete project documentation');",
+              "});",
+              "",
+              "// Test 3: Check completed status is updated",
+              "pm.test('Todo completed status is updated to true', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.completed).to.equal(true);",
+              "});",
+              "",
+              "// Test 4: Check _id remains the same",
+              "pm.test('Todo ID remains unchanged', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData._id).to.equal(pm.environment.get('todo_id'));",
+              "});",
+              "",
+              "// Test 5: Check createdAt is unchanged",
+              "pm.test('CreatedAt timestamp is unchanged', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('createdAt');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated: Complete project documentation\",\n  \"completed\": true,\n  \"dueDate\": \"2026-12-20\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos/{{todo_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "{{todo_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "7. PUT - Update Todo (Invalid ID)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 404",
+              "pm.test('Status code is 404 for invalid ID', function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "// Test 2: Check error message",
+              "pm.test('Error message indicates todo not found', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData.error).to.include('not found');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"This should fail\",\n  \"completed\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos/invalid_id_12345",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "invalid_id_12345"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8. PUT - Partial Update (Only Title)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 200",
+              "pm.test('Status code is 200 for partial update', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test 2: Check only title is updated",
+              "pm.test('Only title is updated', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.title).to.equal('Partial Update Test');",
+              "});",
+              "",
+              "// Test 3: Check other fields can be updated",
+              "pm.test('Response contains all fields', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.all.keys('_id', 'title', 'completed', 'dueDate', 'createdAt', '__v');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Partial Update Test\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos/{{todo_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "{{todo_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "9. DELETE - Delete Todo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 200",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test 2: Check success message",
+              "pm.test('Success message is present', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "    pm.expect(jsonData.message).to.include('deleted');",
+              "});",
+              "",
+              "// Test 3: Clear todo_id from environment after deletion",
+              "pm.test('Clear environment after successful deletion', function () {",
+              "    pm.environment.unset('todo_id');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/todos/{{todo_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "{{todo_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "10. DELETE - Delete Todo (Invalid ID)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Check status code is 404",
+              "pm.test('Status code is 404 for invalid ID', function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "// Test 2: Check error message",
+              "pm.test('Error message indicates todo not found', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData.error).to.include('not found');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/todos/invalid_id_12345",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "invalid_id_12345"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "todo_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "todo_title",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
