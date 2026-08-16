@@ -29,3 +29,44 @@ unit_test:
   script:
     - npm ci --cache .npm --prefer-offline
     - npm test
+
+
+api_test:
+ stage: test
+ 
+ services:
+  - name: mongo:6.0
+    alias: mongodb
+
+ variables:
+  MONGODB_URI: "mongodb://mongodb:27017/todoapp"
+  PORT: 3000
+
+ before_script:
+  - npm ci --cache .npm --prefer-offline
+  - npm install -g newman
+
+ script:
+  - npm start &
+  - |
+    for i in $(seq 1 30); do
+      if wget -q -O- http://localhost:3000/todos > /dev/null 2>&1; then
+          echo "API is ready"
+          break
+      fi
+      echo "Waiting for API..."
+      sleep 2
+    done
+
+  - newman run Postman_Collection.json
+     -e Postman_Environment.json
+     -g globals.json
+     -r cli,json
+     --reporter-json-export postman-results.json
+     
+ artifacts:
+    when: always
+    paths:
+      - postman-results.json
+    expire_in: 7 days
+  
