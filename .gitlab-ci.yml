@@ -45,6 +45,7 @@ api_test:
  before_script:
   - npm ci --cache .npm --prefer-offline
   - npm install -g newman
+  - npm install -g newman-reporter-html
 
  script:
   - npm start &
@@ -58,15 +59,17 @@ api_test:
       sleep 2
     done
 
-  - newman run Postman_Collection.json
-     -e Postman_Environment.json
-     -g globals.json
-     -r cli,json
-     --reporter-json-export postman-results.json
-     
+  - newman run Postman_Collection.json \
+      -e Postman_Environment.json \
+      -g globals.json \
+      -r cli,json,html \
+      --reporter-json-export postman-results.json \
+      --reporter-html-export postman-report.html
+
  artifacts:
     when: always
     paths:
       - postman-results.json
-    expire_in: 7 days
+      - postman-report.html
+    expire_in: 30 days
   

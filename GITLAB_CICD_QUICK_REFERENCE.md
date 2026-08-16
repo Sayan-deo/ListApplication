@@ -25,7 +25,10 @@ docker run -d --name mongo-test -p 27017:27017 mongo:6.0
 
 # Terminal 2: Setup and run tests
 npm install
+
+# Install Newman and HTML reporter globally
 npm install -g newman
+npm install -g newman-reporter-html
 
 export MONGODB_URI="mongodb://localhost:27017/todoapp"
 export NODE_ENV="test"
@@ -37,7 +40,7 @@ sleep 5
 newman run Postman_Collection.json \
   -e Postman_Environment.json \
   -g globals.json \
-  -r json,html,cli \
+  -r cli,json,html \
   --reporter-json-export postman-results.json \
   --reporter-html-export postman-report.html \
   --bail \

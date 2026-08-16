@@ -122,6 +122,28 @@ A comprehensive Postman collection is included for testing all API endpoints wit
    - Select the imported collection
    - Click **Run** to execute all tests
 
+### Run Tests Locally (Automated Setup)
+
+**Linux/macOS:**
+```bash
+chmod +x run-local-tests.sh
+./run-local-tests.sh
+```
+
+**Windows:**
+```bash
+run-local-tests.bat
+```
+
+The script will:
+- ✅ Install all dependencies
+- ✅ Install Newman and HTML reporter
+- ✅ Start MongoDB automatically
+- ✅ Start your API server
+- ✅ Run all 30+ test cases
+- ✅ Generate HTML report
+- ✅ Clean up resources
+
 ### Test Coverage
 
 The Postman collection includes tests for:

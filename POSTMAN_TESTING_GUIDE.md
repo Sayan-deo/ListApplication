@@ -365,14 +365,17 @@ pm.environment.set('timestamp', new Date().toISOString());
 Run collection in CI/CD pipeline using Newman (Postman CLI):
 
 ```bash
-# Install Newman
+# Install Newman and HTML reporter
 npm install -g newman
+npm install -g newman-reporter-html
 
 # Run collection
 newman run Postman_Collection.json \
-  -e environment.json \
+  -e Postman_Environment.json \
+  -g globals.json \
   -r json,html \
-  --reporter-html-export results.html
+  --reporter-json-export postman-results.json \
+  --reporter-html-export postman-report.html
 ```
 
 ---

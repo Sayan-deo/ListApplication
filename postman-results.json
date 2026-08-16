@@ -1,0 +1,4335 @@
+{
+  "collection": {
+    "item": [
+      {
+        "id": "41a19157-aef2-4589-b382-d09efb503050",
+        "name": "Setup - Create Todo for Testing",
+        "request": {
+          "url": {
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Test Todo Item\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-31\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "31e42dca-7649-4cbb-9ced-c4ed45d7b23f",
+              "type": "text/javascript",
+              "exec": [
+                "if (pm.response.code === 201) {",
+                "    const responseData = pm.response.json();",
+                "    pm.environment.set('todo_id', responseData._id);",
+                "    pm.environment.set('todo_title', responseData.title);",
+                "    console.log('Test Todo Created - ID: ' + responseData._id);",
+                "}"
+              ],
+              "_lastExecutionId": "d4b1680f-7bd9-4ecd-a65a-8456215d6ee9"
+            }
+          }
+        ]
+      },
+      {
+        "id": "9e8c9b8c-155b-42d6-9ebf-30901230a157",
+        "name": "1. GET - Retrieve All Todos",
+        "request": {
+          "url": {
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "1152579f-49a9-4263-a620-0df0c02a45f3",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check response status code",
+                "pm.test('Status code is 200', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "// Test 2: Check response time",
+                "pm.test('Response time is less than 500ms', function () {",
+                "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                "});",
+                "",
+                "// Test 3: Check response is an array",
+                "pm.test('Response is an array', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.be.an('array');",
+                "});",
+                "",
+                "// Test 4: Check array structure (if not empty)",
+                "pm.test('Response contains valid todo objects', function () {",
+                "    var jsonData = pm.response.json();",
+                "    if (jsonData.length > 0) {",
+                "        jsonData.forEach(function(todo) {",
+                "            pm.expect(todo).to.have.property('_id');",
+                "            pm.expect(todo).to.have.property('title');",
+                "            pm.expect(todo).to.have.property('completed');",
+                "            pm.expect(todo.completed).to.be.a('boolean');",
+                "        });",
+                "    }",
+                "});",
+                "",
+                "// Test 5: Check Content-Type header",
+                "pm.test('Content-Type header is application/json', function () {",
+                "    pm.response.to.have.header('Content-Type');",
+                "});"
+              ],
+              "_lastExecutionId": "d966f59a-be79-4713-a8ed-4f70d1c65a48"
+            }
+          }
+        ]
+      },
+      {
+        "id": "31386500-211a-43c0-9b56-ece7ec94c39f",
+        "name": "2. POST - Create New Todo (Valid Data)",
+        "request": {
+          "url": {
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Complete project documentation\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "a139758b-c934-421c-ac3c-b4f3ce0781fe",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 201 Created",
+                "pm.test('Status code is 201 Created', function () {",
+                "    pm.response.to.have.status(201);",
+                "});",
+                "",
+                "// Test 2: Check response contains _id",
+                "pm.test('Response contains _id', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('_id');",
+                "    pm.expect(jsonData._id).to.be.a('string');",
+                "});",
+                "",
+                "// Test 3: Check title matches request",
+                "pm.test('Todo title matches request body', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData.title).to.equal('Complete project documentation');",
+                "});",
+                "",
+                "// Test 4: Check completed defaults to false",
+                "pm.test('Completed field defaults to false', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData.completed).to.equal(false);",
+                "});",
+                "",
+                "// Test 5: Check dueDate is present",
+                "pm.test('Due date is present in response', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('dueDate');",
+                "});",
+                "",
+                "// Test 6: Check createdAt timestamp exists",
+                "pm.test('CreatedAt timestamp is present', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('createdAt');",
+                "});"
+              ],
+              "_lastExecutionId": "bf42493b-c316-43b4-b91e-2628f9abcc44"
+            }
+          }
+        ]
+      },
+      {
+        "id": "66ea55f1-d8f7-460a-bb80-4e362992132d",
+        "name": "3. POST - Create Todo (Missing Required Field)",
+        "request": {
+          "url": {
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "5b7202d6-b2e7-4a0b-a76b-b20300cec679",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 400 Bad Request",
+                "pm.test('Status code is 400 for missing title', function () {",
+                "    pm.response.to.have.status(400);",
+                "});",
+                "",
+                "// Test 2: Check error message is present",
+                "pm.test('Error message is present in response', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('error');",
+                "    pm.expect(jsonData.error).to.be.a('string');",
+                "});"
+              ],
+              "_lastExecutionId": "995576ae-8b2b-4ad3-9ad6-92b05e4ecfb1"
+            }
+          }
+        ]
+      },
+      {
+        "id": "af33015c-7490-45a2-aa0c-330ad3088b79",
+        "name": "4. GET - Retrieve Single Todo by ID",
+        "request": {
+          "url": {
+            "path": [
+              "todos",
+              "{{todo_id}}"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "badfa3e9-fe2e-46fa-b51c-25f182423837",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 200",
+                "pm.test('Status code is 200', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "// Test 2: Check response is an object",
+                "pm.test('Response is a single todo object', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.be.an('object');",
+                "});",
+                "",
+                "// Test 3: Check required properties exist",
+                "pm.test('Todo object has all required properties', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('_id');",
+                "    pm.expect(jsonData).to.have.property('title');",
+                "    pm.expect(jsonData).to.have.property('completed');",
+                "    pm.expect(jsonData).to.have.property('createdAt');",
+                "});",
+                "",
+                "// Test 4: Check _id matches the requested ID",
+                "pm.test('Returned todo ID matches requested ID', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData._id).to.equal(pm.environment.get('todo_id'));",
+                "});"
+              ],
+              "_lastExecutionId": "153394e3-627e-47d2-8d1d-2828a6d7de49"
+            }
+          }
+        ]
+      },
+      {
+        "id": "750335a9-aa5c-465d-8cfb-3063703c462d",
+        "name": "5. GET - Retrieve Todo with Invalid ID",
+        "request": {
+          "url": {
+            "path": [
+              "todos",
+              "invalid_id_12345"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "b10da450-fd16-46eb-87e1-45416607c252",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 404 Not Found",
+                "pm.test('Status code is 404 for invalid ID', function () {",
+                "    pm.response.to.have.status(404);",
+                "});",
+                "",
+                "// Test 2: Check error message is present",
+                "pm.test('Error message indicates todo not found', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('error');",
+                "    pm.expect(jsonData.error).to.include('not found');",
+                "});"
+              ],
+              "_lastExecutionId": "1aeec256-ac5b-4d3c-bde3-027facf2a0d2"
+            }
+          }
+        ]
+      },
+      {
+        "id": "5cfd1914-5d4c-4115-9261-4b3a8bb83b37",
+        "name": "6. PUT - Update Todo (Valid Data)",
+        "request": {
+          "url": {
+            "path": [
+              "todos",
+              "{{todo_id}}"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Updated: Complete project documentation\",\n  \"completed\": true,\n  \"dueDate\": \"2026-12-20\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "e708b704-944a-4794-ab5c-73edff420d69",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 200",
+                "pm.test('Status code is 200', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "// Test 2: Check updated title",
+                "pm.test('Todo title is updated', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData.title).to.equal('Updated: Complete project documentation');",
+                "});",
+                "",
+                "// Test 3: Check completed status is updated",
+                "pm.test('Todo completed status is updated to true', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData.completed).to.equal(true);",
+                "});",
+                "",
+                "// Test 4: Check _id remains the same",
+                "pm.test('Todo ID remains unchanged', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData._id).to.equal(pm.environment.get('todo_id'));",
+                "});",
+                "",
+                "// Test 5: Check createdAt is unchanged",
+                "pm.test('CreatedAt timestamp is unchanged', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('createdAt');",
+                "});"
+              ],
+              "_lastExecutionId": "2f2670a9-e248-4b80-bcc2-cd2724842b3e"
+            }
+          }
+        ]
+      },
+      {
+        "id": "c8183c75-71bb-44c5-8a37-fd2ce5993078",
+        "name": "7. PUT - Update Todo (Invalid ID)",
+        "request": {
+          "url": {
+            "path": [
+              "todos",
+              "invalid_id_12345"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"This should fail\",\n  \"completed\": false\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "56f9a28e-e5da-42cb-9a36-ca67568f0751",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 404",
+                "pm.test('Status code is 404 for invalid ID', function () {",
+                "    pm.response.to.have.status(404);",
+                "});",
+                "",
+                "// Test 2: Check error message",
+                "pm.test('Error message indicates todo not found', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('error');",
+                "    pm.expect(jsonData.error).to.include('not found');",
+                "});"
+              ],
+              "_lastExecutionId": "42afdc99-abf2-4922-94f5-83b34b0c51f0"
+            }
+          }
+        ]
+      },
+      {
+        "id": "ce25246a-6dc2-43ad-963b-a539bbef5d16",
+        "name": "8. PUT - Partial Update (Only Title)",
+        "request": {
+          "url": {
+            "path": [
+              "todos",
+              "{{todo_id}}"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Partial Update Test\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "840a4502-153f-4264-882c-fd970da77be4",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 200",
+                "pm.test('Status code is 200 for partial update', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "// Test 2: Check only title is updated",
+                "pm.test('Only title is updated', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData.title).to.equal('Partial Update Test');",
+                "});",
+                "",
+                "// Test 3: Check other fields can be updated",
+                "pm.test('Response contains all fields', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.all.keys('_id', 'title', 'completed', 'dueDate', 'createdAt', '__v');",
+                "});"
+              ],
+              "_lastExecutionId": "b4664b56-aed9-4a1e-be67-21f03aabe008"
+            }
+          }
+        ]
+      },
+      {
+        "id": "bc3666b3-d522-4b97-a4ba-178822880efc",
+        "name": "9. DELETE - Delete Todo",
+        "request": {
+          "url": {
+            "path": [
+              "todos",
+              "{{todo_id}}"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "DELETE"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "42205037-2fb3-4332-82be-c3f54f1c984f",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 200",
+                "pm.test('Status code is 200', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "// Test 2: Check success message",
+                "pm.test('Success message is present', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('message');",
+                "    pm.expect(jsonData.message).to.include('deleted');",
+                "});",
+                "",
+                "// Test 3: Clear todo_id from environment after deletion",
+                "pm.test('Clear environment after successful deletion', function () {",
+                "    pm.environment.unset('todo_id');",
+                "});"
+              ],
+              "_lastExecutionId": "e94ecdd3-2918-4f25-a09e-79b136f697a8"
+            }
+          }
+        ]
+      },
+      {
+        "id": "25e5a7da-2272-4ca5-bfb5-d34306b058fd",
+        "name": "10. DELETE - Delete Todo (Invalid ID)",
+        "request": {
+          "url": {
+            "path": [
+              "todos",
+              "invalid_id_12345"
+            ],
+            "host": [
+              "{{base_url}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "DELETE"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "3f7a6474-8c9b-495d-a79f-7ec5f61dcf2b",
+              "type": "text/javascript",
+              "exec": [
+                "// Test 1: Check status code is 404",
+                "pm.test('Status code is 404 for invalid ID', function () {",
+                "    pm.response.to.have.status(404);",
+                "});",
+                "",
+                "// Test 2: Check error message",
+                "pm.test('Error message indicates todo not found', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property('error');",
+                "    pm.expect(jsonData.error).to.include('not found');",
+                "});"
+              ],
+              "_lastExecutionId": "864451c3-4217-4213-b1e9-c27700b152e8"
+            }
+          }
+        ]
+      }
+    ],
+    "event": [],
+    "variable": [
+      {
+        "type": "string",
+        "value": "http://localhost:3000",
+        "key": "base_url"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "todo_id"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "todo_title"
+      }
+    ],
+    "info": {
+      "_postman_id": "71eb539a-e5b5-4d5a-a9d8-5cf0c0152848",
+      "name": "Todo API Test Suite",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Comprehensive test cases for Todo REST API endpoints",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2024-01-15T10:30:00.000Z",
+      "postman_exported_using": "Postman/11.0.0"
+    },
+    "id": "todo-api-env",
+    "name": "Todo API Environment",
+    "values": [
+      {
+        "type": "any",
+        "value": "http://localhost:3000",
+        "key": "base_url"
+      },
+      {
+        "type": "any",
+        "value": "Test Todo Item",
+        "key": "todo_title"
+      }
+    ]
+  },
+  "globals": {
+    "_": {
+      "postman_variable_scope": "globals",
+      "postman_exported_at": "2024-01-15T10:30:00.000Z",
+      "postman_exported_using": "Postman/11.0.0"
+    },
+    "id": "globals",
+    "values": [
+      {
+        "type": "string",
+        "value": "http://localhost:3000",
+        "key": "base_url"
+      },
+      {
+        "type": "number",
+        "value": 5000,
+        "key": "timeout_ms"
+      },
+      {
+        "type": "number",
+        "value": 2,
+        "key": "retry_count"
+      },
+      {
+        "type": "string",
+        "value": "CI Test Todo",
+        "key": "test_todo_title"
+      },
+      {
+        "type": "string",
+        "value": "2026-12-31",
+        "key": "test_todo_due_date"
+      },
+      {
+        "type": "string",
+        "value": "ci",
+        "key": "env_type"
+      },
+      {
+        "type": "string",
+        "value": "{{$timestamp}}",
+        "key": "timestamp"
+      }
+    ]
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 11,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 11,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 11,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 11,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 11,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 34,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 11,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 48,
+      "responseMin": 2,
+      "responseMax": 147,
+      "responseSd": 42.90793526949192,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1786871273020,
+      "completed": 1786871273730
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 11,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "00a809d1-c84c-439b-b00f-a012dd055752",
+          "httpRequestId": "8c20608f-6aea-4f63-a648-d7de67bd6526"
+        },
+        "item": {
+          "id": "41a19157-aef2-4589-b382-d09efb503050",
+          "name": "Setup - Create Todo for Testing",
+          "request": {
+            "url": {
+              "path": [
+                "todos"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Todo Item\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-31\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "31e42dca-7649-4cbb-9ced-c4ed45d7b23f",
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseData = pm.response.json();",
+                  "    pm.environment.set('todo_id', responseData._id);",
+                  "    pm.environment.set('todo_title', responseData.title);",
+                  "    console.log('Test Todo Created - ID: ' + responseData._id);",
+                  "}"
+                ],
+                "_lastExecutionId": "d4b1680f-7bd9-4ecd-a65a-8456215d6ee9"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "687deeb6-bb7b-41f5-ad87-098e979ed46e",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "80",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Test Todo Item\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-31\"\n}"
+          }
+        },
+        "response": {
+          "id": "c870db1e-131a-4fa4-bd0f-60f842b6990b",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "161"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"a1-xvBhIRfk2F3KJn+yQqzjx2JsTXw\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              84,
+              101,
+              115,
+              116,
+              32,
+              84,
+              111,
+              100,
+              111,
+              32,
+              73,
+              116,
+              101,
+              109,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              51,
+              49,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              100,
+              101,
+              57,
+              52,
+              99,
+              100,
+              101,
+              98,
+              50,
+              55,
+              102,
+              55,
+              100,
+              101,
+              100,
+              48,
+              57,
+              49,
+              49,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              57,
+              58,
+              48,
+              55,
+              58,
+              53,
+              51,
+              46,
+              48,
+              52,
+              48,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 72,
+          "responseSize": 161
+        },
+        "id": "41a19157-aef2-4589-b382-d09efb503050"
+      },
+      {
+        "cursor": {
+          "ref": "56534b45-6661-404a-991e-3a9a10a56138",
+          "length": 11,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "9beacc15-7919-4da3-a54d-0bb8d49f0438"
+        },
+        "item": {
+          "id": "9e8c9b8c-155b-42d6-9ebf-30901230a157",
+          "name": "1. GET - Retrieve All Todos",
+          "request": {
+            "url": {
+              "path": [
+                "todos"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "1152579f-49a9-4263-a620-0df0c02a45f3",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check response status code",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test 2: Check response time",
+                  "pm.test('Response time is less than 500ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "// Test 3: Check response is an array",
+                  "pm.test('Response is an array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Test 4: Check array structure (if not empty)",
+                  "pm.test('Response contains valid todo objects', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.length > 0) {",
+                  "        jsonData.forEach(function(todo) {",
+                  "            pm.expect(todo).to.have.property('_id');",
+                  "            pm.expect(todo).to.have.property('title');",
+                  "            pm.expect(todo).to.have.property('completed');",
+                  "            pm.expect(todo.completed).to.be.a('boolean');",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "// Test 5: Check Content-Type header",
+                  "pm.test('Content-Type header is application/json', function () {",
+                  "    pm.response.to.have.header('Content-Type');",
+                  "});"
+                ],
+                "_lastExecutionId": "d966f59a-be79-4713-a8ed-4f70d1c65a48"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "ed28b0d4-5242-4bf2-9c63-e3e6f04f5e9a",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "f8f06808-bc9a-4d6a-a2fb-b53efa0a9694",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "519"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"207-TukWXnvT5ZPZssW/6xOl7AVe3JI\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              91,
+              123,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              54,
+              49,
+              49,
+              49,
+              102,
+              56,
+              102,
+              52,
+              100,
+              54,
+              97,
+              48,
+              97,
+              100,
+              99,
+              56,
+              56,
+              50,
+              52,
+              34,
+              44,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              67,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              32,
+              112,
+              114,
+              111,
+              106,
+              101,
+              99,
+              116,
+              32,
+              100,
+              111,
+              99,
+              117,
+              109,
+              101,
+              110,
+              116,
+              97,
+              116,
+              105,
+              111,
+              110,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              50,
+              53,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              56,
+              58,
+              51,
+              52,
+              58,
+              50,
+              53,
+              46,
+              55,
+              53,
+              56,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125,
+              44,
+              123,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              100,
+              97,
+              54,
+              52,
+              99,
+              100,
+              101,
+              98,
+              50,
+              55,
+              102,
+              55,
+              100,
+              101,
+              100,
+              48,
+              57,
+              48,
+              102,
+              34,
+              44,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              67,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              32,
+              112,
+              114,
+              111,
+              106,
+              101,
+              99,
+              116,
+              32,
+              100,
+              111,
+              99,
+              117,
+              109,
+              101,
+              110,
+              116,
+              97,
+              116,
+              105,
+              111,
+              110,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              50,
+              53,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              57,
+              58,
+              48,
+              54,
+              58,
+              52,
+              54,
+              46,
+              52,
+              51,
+              57,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125,
+              44,
+              123,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              100,
+              101,
+              57,
+              52,
+              99,
+              100,
+              101,
+              98,
+              50,
+              55,
+              102,
+              55,
+              100,
+              101,
+              100,
+              48,
+              57,
+              49,
+              49,
+              34,
+              44,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              84,
+              101,
+              115,
+              116,
+              32,
+              84,
+              111,
+              100,
+              111,
+              32,
+              73,
+              116,
+              101,
+              109,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              51,
+              49,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              57,
+              58,
+              48,
+              55,
+              58,
+              53,
+              51,
+              46,
+              48,
+              52,
+              48,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 51,
+          "responseSize": 519
+        },
+        "id": "9e8c9b8c-155b-42d6-9ebf-30901230a157",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response time is less than 500ms",
+            "skipped": false
+          },
+          {
+            "assertion": "Response is an array",
+            "skipped": false
+          },
+          {
+            "assertion": "Response contains valid todo objects",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type header is application/json",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "8f77868a-140f-49f5-95eb-134178bd38c6",
+          "length": 11,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "643a0d08-490e-4e22-a490-d01c42695850"
+        },
+        "item": {
+          "id": "31386500-211a-43c0-9b56-ece7ec94c39f",
+          "name": "2. POST - Create New Todo (Valid Data)",
+          "request": {
+            "url": {
+              "path": [
+                "todos"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Complete project documentation\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a139758b-c934-421c-ac3c-b4f3ce0781fe",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 201 Created",
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Test 2: Check response contains _id",
+                  "pm.test('Response contains _id', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "    pm.expect(jsonData._id).to.be.a('string');",
+                  "});",
+                  "",
+                  "// Test 3: Check title matches request",
+                  "pm.test('Todo title matches request body', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.equal('Complete project documentation');",
+                  "});",
+                  "",
+                  "// Test 4: Check completed defaults to false",
+                  "pm.test('Completed field defaults to false', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.completed).to.equal(false);",
+                  "});",
+                  "",
+                  "// Test 5: Check dueDate is present",
+                  "pm.test('Due date is present in response', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('dueDate');",
+                  "});",
+                  "",
+                  "// Test 6: Check createdAt timestamp exists",
+                  "pm.test('CreatedAt timestamp is present', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('createdAt');",
+                  "});"
+                ],
+                "_lastExecutionId": "bf42493b-c316-43b4-b91e-2628f9abcc44"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "58bd28f1-ce84-4778-b304-ae3d5b7e76aa",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "96",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Complete project documentation\",\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+          }
+        },
+        "response": {
+          "id": "0d4ebb36-8f05-45b5-9a18-eba8b9d2d92b",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "177"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"b1-aCopZZ2y/ea2LZ4CCNJs9roH/ec\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              67,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              32,
+              112,
+              114,
+              111,
+              106,
+              101,
+              99,
+              116,
+              32,
+              100,
+              111,
+              99,
+              117,
+              109,
+              101,
+              110,
+              116,
+              97,
+              116,
+              105,
+              111,
+              110,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              50,
+              53,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              100,
+              101,
+              57,
+              52,
+              99,
+              100,
+              101,
+              98,
+              50,
+              55,
+              102,
+              55,
+              100,
+              101,
+              100,
+              48,
+              57,
+              49,
+              50,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              57,
+              58,
+              48,
+              55,
+              58,
+              53,
+              51,
+              46,
+              49,
+              57,
+              51,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 39,
+          "responseSize": 177
+        },
+        "id": "31386500-211a-43c0-9b56-ece7ec94c39f",
+        "assertions": [
+          {
+            "assertion": "Status code is 201 Created",
+            "skipped": false
+          },
+          {
+            "assertion": "Response contains _id",
+            "skipped": false
+          },
+          {
+            "assertion": "Todo title matches request body",
+            "skipped": false
+          },
+          {
+            "assertion": "Completed field defaults to false",
+            "skipped": false
+          },
+          {
+            "assertion": "Due date is present in response",
+            "skipped": false
+          },
+          {
+            "assertion": "CreatedAt timestamp is present",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "a006e403-5856-4d29-a884-48d9fe4ac2d7",
+          "length": 11,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "c051b242-7a1b-4331-8630-f1162f0d40c0"
+        },
+        "item": {
+          "id": "66ea55f1-d8f7-460a-bb80-4e362992132d",
+          "name": "3. POST - Create Todo (Missing Required Field)",
+          "request": {
+            "url": {
+              "path": [
+                "todos"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5b7202d6-b2e7-4a0b-a76b-b20300cec679",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 400 Bad Request",
+                  "pm.test('Status code is 400 for missing title', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// Test 2: Check error message is present",
+                  "pm.test('Error message is present in response', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData.error).to.be.a('string');",
+                  "});"
+                ],
+                "_lastExecutionId": "995576ae-8b2b-4ad3-9ad6-92b05e4ecfb1"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "41ebb903-2e0f-4ff0-bbd5-321d3ef72d73",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "51",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"completed\": false,\n  \"dueDate\": \"2026-12-25\"\n}"
+          }
+        },
+        "response": {
+          "id": "252d0238-604e-4269-8018-befe2e5c6e9e",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "68"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"44-x6ukOVEXQ/hrxZMg0F9X8P3/5C4\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              84,
+              111,
+              100,
+              111,
+              32,
+              118,
+              97,
+              108,
+              105,
+              100,
+              97,
+              116,
+              105,
+              111,
+              110,
+              32,
+              102,
+              97,
+              105,
+              108,
+              101,
+              100,
+              58,
+              32,
+              116,
+              105,
+              116,
+              108,
+              101,
+              58,
+              32,
+              80,
+              97,
+              116,
+              104,
+              32,
+              96,
+              116,
+              105,
+              116,
+              108,
+              101,
+              96,
+              32,
+              105,
+              115,
+              32,
+              114,
+              101,
+              113,
+              117,
+              105,
+              114,
+              101,
+              100,
+              46,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 3,
+          "responseSize": 68
+        },
+        "id": "66ea55f1-d8f7-460a-bb80-4e362992132d",
+        "assertions": [
+          {
+            "assertion": "Status code is 400 for missing title",
+            "skipped": false
+          },
+          {
+            "assertion": "Error message is present in response",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "8021e0fa-4a64-44c4-a0b1-530eca24e13f",
+          "length": 11,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "1af02409-5e67-4cbb-bd1e-37f3ad7a87e0"
+        },
+        "item": {
+          "id": "af33015c-7490-45a2-aa0c-330ad3088b79",
+          "name": "4. GET - Retrieve Single Todo by ID",
+          "request": {
+            "url": {
+              "path": [
+                "todos",
+                "{{todo_id}}"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "badfa3e9-fe2e-46fa-b51c-25f182423837",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 200",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test 2: Check response is an object",
+                  "pm.test('Response is a single todo object', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "});",
+                  "",
+                  "// Test 3: Check required properties exist",
+                  "pm.test('Todo object has all required properties', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.have.property('completed');",
+                  "    pm.expect(jsonData).to.have.property('createdAt');",
+                  "});",
+                  "",
+                  "// Test 4: Check _id matches the requested ID",
+                  "pm.test('Returned todo ID matches requested ID', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData._id).to.equal(pm.environment.get('todo_id'));",
+                  "});"
+                ],
+                "_lastExecutionId": "153394e3-627e-47d2-8d1d-2828a6d7de49"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos",
+              "6a817de94cdeb27f7ded0911"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "2fa9808b-901f-4bf1-b078-cdfab92f6f00",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "51c52033-5a43-47b7-9fd1-0cf6ff440532",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "161"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"a1-wqa1ivhgjXnxBbgU6ET1WXkbP5E\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              100,
+              101,
+              57,
+              52,
+              99,
+              100,
+              101,
+              98,
+              50,
+              55,
+              102,
+              55,
+              100,
+              101,
+              100,
+              48,
+              57,
+              49,
+              49,
+              34,
+              44,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              84,
+              101,
+              115,
+              116,
+              32,
+              84,
+              111,
+              100,
+              111,
+              32,
+              73,
+              116,
+              101,
+              109,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              51,
+              49,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              57,
+              58,
+              48,
+              55,
+              58,
+              53,
+              51,
+              46,
+              48,
+              52,
+              48,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 57,
+          "responseSize": 161
+        },
+        "id": "af33015c-7490-45a2-aa0c-330ad3088b79",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response is a single todo object",
+            "skipped": false
+          },
+          {
+            "assertion": "Todo object has all required properties",
+            "skipped": false
+          },
+          {
+            "assertion": "Returned todo ID matches requested ID",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "e20452a7-cf9e-42bc-86c6-9252d7f128c6",
+          "length": 11,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "5fed634d-b745-4c8e-9b9f-61650d2915fc"
+        },
+        "item": {
+          "id": "750335a9-aa5c-465d-8cfb-3063703c462d",
+          "name": "5. GET - Retrieve Todo with Invalid ID",
+          "request": {
+            "url": {
+              "path": [
+                "todos",
+                "invalid_id_12345"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "b10da450-fd16-46eb-87e1-45416607c252",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 404 Not Found",
+                  "pm.test('Status code is 404 for invalid ID', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "// Test 2: Check error message is present",
+                  "pm.test('Error message indicates todo not found', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData.error).to.include('not found');",
+                  "});"
+                ],
+                "_lastExecutionId": "1aeec256-ac5b-4d3c-bde3-027facf2a0d2"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos",
+              "invalid_id_12345"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "0f6e23f9-9504-47ee-8d93-11443aefd7d0",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "04dc593b-7392-415f-bd96-deb5be9a62d4",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "26"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1a-hwodwbWGyVn+6gaESAkhR6ThSk4\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              84,
+              111,
+              100,
+              111,
+              32,
+              110,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 3,
+          "responseSize": 26
+        },
+        "id": "750335a9-aa5c-465d-8cfb-3063703c462d",
+        "assertions": [
+          {
+            "assertion": "Status code is 404 for invalid ID",
+            "skipped": false
+          },
+          {
+            "assertion": "Error message indicates todo not found",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "c4a3a9c8-5c1e-4429-a84e-beac2b69139f",
+          "length": 11,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "c0293d00-aa7f-425d-bc1b-d69052556885"
+        },
+        "item": {
+          "id": "5cfd1914-5d4c-4115-9261-4b3a8bb83b37",
+          "name": "6. PUT - Update Todo (Valid Data)",
+          "request": {
+            "url": {
+              "path": [
+                "todos",
+                "{{todo_id}}"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Complete project documentation\",\n  \"completed\": true,\n  \"dueDate\": \"2026-12-20\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "e708b704-944a-4794-ab5c-73edff420d69",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 200",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test 2: Check updated title",
+                  "pm.test('Todo title is updated', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.equal('Updated: Complete project documentation');",
+                  "});",
+                  "",
+                  "// Test 3: Check completed status is updated",
+                  "pm.test('Todo completed status is updated to true', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.completed).to.equal(true);",
+                  "});",
+                  "",
+                  "// Test 4: Check _id remains the same",
+                  "pm.test('Todo ID remains unchanged', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData._id).to.equal(pm.environment.get('todo_id'));",
+                  "});",
+                  "",
+                  "// Test 5: Check createdAt is unchanged",
+                  "pm.test('CreatedAt timestamp is unchanged', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('createdAt');",
+                  "});"
+                ],
+                "_lastExecutionId": "2f2670a9-e248-4b80-bcc2-cd2724842b3e"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos",
+              "6a817de94cdeb27f7ded0911"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "474d146f-fbb9-4195-97e8-e3ef6c71dfae",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "104",
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Updated: Complete project documentation\",\n  \"completed\": true,\n  \"dueDate\": \"2026-12-20\"\n}"
+          }
+        },
+        "response": {
+          "id": "aab4c795-c9e8-45d1-89ea-37256a41c987",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "185"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"b9-WQtckkhFtxHfSDzwE1Veu/TKJOk\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              100,
+              101,
+              57,
+              52,
+              99,
+              100,
+              101,
+              98,
+              50,
+              55,
+              102,
+              55,
+              100,
+              101,
+              100,
+              48,
+              57,
+              49,
+              49,
+              34,
+              44,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              85,
+              112,
+              100,
+              97,
+              116,
+              101,
+              100,
+              58,
+              32,
+              67,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              32,
+              112,
+              114,
+              111,
+              106,
+              101,
+              99,
+              116,
+              32,
+              100,
+              111,
+              99,
+              117,
+              109,
+              101,
+              110,
+              116,
+              97,
+              116,
+              105,
+              111,
+              110,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              50,
+              48,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              57,
+              58,
+              48,
+              55,
+              58,
+              53,
+              51,
+              46,
+              48,
+              52,
+              48,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 75,
+          "responseSize": 185
+        },
+        "id": "5cfd1914-5d4c-4115-9261-4b3a8bb83b37",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Todo title is updated",
+            "skipped": false
+          },
+          {
+            "assertion": "Todo completed status is updated to true",
+            "skipped": false
+          },
+          {
+            "assertion": "Todo ID remains unchanged",
+            "skipped": false
+          },
+          {
+            "assertion": "CreatedAt timestamp is unchanged",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "49e5f8d0-8214-4972-93d6-e7761a7ac0c4",
+          "length": 11,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "5dd51cdd-f01f-4e84-b7f7-b7197a77b2dd"
+        },
+        "item": {
+          "id": "c8183c75-71bb-44c5-8a37-fd2ce5993078",
+          "name": "7. PUT - Update Todo (Invalid ID)",
+          "request": {
+            "url": {
+              "path": [
+                "todos",
+                "invalid_id_12345"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"This should fail\",\n  \"completed\": false\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "56f9a28e-e5da-42cb-9a36-ca67568f0751",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 404",
+                  "pm.test('Status code is 404 for invalid ID', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "// Test 2: Check error message",
+                  "pm.test('Error message indicates todo not found', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData.error).to.include('not found');",
+                  "});"
+                ],
+                "_lastExecutionId": "42afdc99-abf2-4922-94f5-83b34b0c51f0"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos",
+              "invalid_id_12345"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "916cb24f-7364-4629-9682-504a3bdc59e2",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "55",
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"This should fail\",\n  \"completed\": false\n}"
+          }
+        },
+        "response": {
+          "id": "e01ab2c6-ed63-4010-b4d7-2c98967974b6",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "26"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1a-hwodwbWGyVn+6gaESAkhR6ThSk4\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              84,
+              111,
+              100,
+              111,
+              32,
+              110,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 3,
+          "responseSize": 26
+        },
+        "id": "c8183c75-71bb-44c5-8a37-fd2ce5993078",
+        "assertions": [
+          {
+            "assertion": "Status code is 404 for invalid ID",
+            "skipped": false
+          },
+          {
+            "assertion": "Error message indicates todo not found",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "5e8fa8bb-731b-44f0-904c-41b1770c543b",
+          "length": 11,
+          "cycles": 1,
+          "position": 8,
+          "iteration": 0,
+          "httpRequestId": "d7a3e832-e0da-404c-97b1-2423e829a623"
+        },
+        "item": {
+          "id": "ce25246a-6dc2-43ad-963b-a539bbef5d16",
+          "name": "8. PUT - Partial Update (Only Title)",
+          "request": {
+            "url": {
+              "path": [
+                "todos",
+                "{{todo_id}}"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Partial Update Test\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "840a4502-153f-4264-882c-fd970da77be4",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 200",
+                  "pm.test('Status code is 200 for partial update', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test 2: Check only title is updated",
+                  "pm.test('Only title is updated', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.title).to.equal('Partial Update Test');",
+                  "});",
+                  "",
+                  "// Test 3: Check other fields can be updated",
+                  "pm.test('Response contains all fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.all.keys('_id', 'title', 'completed', 'dueDate', 'createdAt', '__v');",
+                  "});"
+                ],
+                "_lastExecutionId": "b4664b56-aed9-4a1e-be67-21f03aabe008"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos",
+              "6a817de94cdeb27f7ded0911"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "e9906024-d45a-42d9-964b-820fe189361b",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "36",
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Partial Update Test\"\n}"
+          }
+        },
+        "response": {
+          "id": "f3aa296a-006d-4ab0-956a-c83eb959671d",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "165"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"a5-EEipd16Db5eJZAEvhNPEpOT9ekI\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              95,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              97,
+              56,
+              49,
+              55,
+              100,
+              101,
+              57,
+              52,
+              99,
+              100,
+              101,
+              98,
+              50,
+              55,
+              102,
+              55,
+              100,
+              101,
+              100,
+              48,
+              57,
+              49,
+              49,
+              34,
+              44,
+              34,
+              116,
+              105,
+              116,
+              108,
+              101,
+              34,
+              58,
+              34,
+              80,
+              97,
+              114,
+              116,
+              105,
+              97,
+              108,
+              32,
+              85,
+              112,
+              100,
+              97,
+              116,
+              101,
+              32,
+              84,
+              101,
+              115,
+              116,
+              34,
+              44,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              100,
+              117,
+              101,
+              68,
+              97,
+              116,
+              101,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              50,
+              45,
+              50,
+              48,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              56,
+              45,
+              49,
+              54,
+              84,
+              48,
+              57,
+              58,
+              48,
+              55,
+              58,
+              53,
+              51,
+              46,
+              48,
+              52,
+              48,
+              90,
+              34,
+              44,
+              34,
+              95,
+              95,
+              118,
+              34,
+              58,
+              48,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 147,
+          "responseSize": 165
+        },
+        "id": "ce25246a-6dc2-43ad-963b-a539bbef5d16",
+        "assertions": [
+          {
+            "assertion": "Status code is 200 for partial update",
+            "skipped": false
+          },
+          {
+            "assertion": "Only title is updated",
+            "skipped": false
+          },
+          {
+            "assertion": "Response contains all fields",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "89ad9f99-e995-476b-88aa-a4bd8d5b3709",
+          "length": 11,
+          "cycles": 1,
+          "position": 9,
+          "iteration": 0,
+          "httpRequestId": "6d8505e4-6914-4bcb-a780-9ff6b1fdb515"
+        },
+        "item": {
+          "id": "bc3666b3-d522-4b97-a4ba-178822880efc",
+          "name": "9. DELETE - Delete Todo",
+          "request": {
+            "url": {
+              "path": [
+                "todos",
+                "{{todo_id}}"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "DELETE"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "42205037-2fb3-4332-82be-c3f54f1c984f",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 200",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test 2: Check success message",
+                  "pm.test('Success message is present', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('deleted');",
+                  "});",
+                  "",
+                  "// Test 3: Clear todo_id from environment after deletion",
+                  "pm.test('Clear environment after successful deletion', function () {",
+                  "    pm.environment.unset('todo_id');",
+                  "});"
+                ],
+                "_lastExecutionId": "e94ecdd3-2918-4f25-a09e-79b136f697a8"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos",
+              "6a817de94cdeb27f7ded0911"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "aa732dd0-61f4-43ed-b0ee-ecfc83f778e9",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "DELETE"
+        },
+        "response": {
+          "id": "26ceff91-c25e-42a1-bb3d-78500e0816fe",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "39"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"27-G2ll1tWYcSVRYYayyJdrrVH1ok8\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              84,
+              111,
+              100,
+              111,
+              32,
+              100,
+              101,
+              108,
+              101,
+              116,
+              101,
+              100,
+              32,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              102,
+              117,
+              108,
+              108,
+              121,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 76,
+          "responseSize": 39
+        },
+        "id": "bc3666b3-d522-4b97-a4ba-178822880efc",
+        "assertions": [
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Success message is present",
+            "skipped": false
+          },
+          {
+            "assertion": "Clear environment after successful deletion",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "899147d3-d48f-4ff3-8669-351482dc24cc",
+          "length": 11,
+          "cycles": 1,
+          "position": 10,
+          "iteration": 0,
+          "httpRequestId": "7ed4b77d-0084-43c9-8669-17e3558c4eaa"
+        },
+        "item": {
+          "id": "25e5a7da-2272-4ca5-bfb5-d34306b058fd",
+          "name": "10. DELETE - Delete Todo (Invalid ID)",
+          "request": {
+            "url": {
+              "path": [
+                "todos",
+                "invalid_id_12345"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "DELETE"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "3f7a6474-8c9b-495d-a79f-7ec5f61dcf2b",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test 1: Check status code is 404",
+                  "pm.test('Status code is 404 for invalid ID', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "// Test 2: Check error message",
+                  "pm.test('Error message indicates todo not found', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData.error).to.include('not found');",
+                  "});"
+                ],
+                "_lastExecutionId": "864451c3-4217-4213-b1e9-c27700b152e8"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "todos",
+              "invalid_id_12345"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "b3930b55-f616-40a1-b4f9-bb1213119528",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "DELETE"
+        },
+        "response": {
+          "id": "a5d53074-72e8-46fd-a29c-c093d32b9da1",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "26"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1a-hwodwbWGyVn+6gaESAkhR6ThSk4\""
+            },
+            {
+              "key": "Date",
+              "value": "Sun, 16 Aug 2026 09:07:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              84,
+              111,
+              100,
+              111,
+              32,
+              110,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 2,
+          "responseSize": 26
+        },
+        "id": "25e5a7da-2272-4ca5-bfb5-d34306b058fd",
+        "assertions": [
+          {
+            "assertion": "Status code is 404 for invalid ID",
+            "skipped": false
+          },
+          {
+            "assertion": "Error message indicates todo not found",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 1553
+    },
+    "failures": [],
+    "error": null
+  }
+}

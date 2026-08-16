@@ -45,6 +45,9 @@ app.get('/todos/:id', async (req, res) => {
     if (!todo) return res.status(404).json({ error: 'Todo not found' });
     res.json(todo);
   } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -61,6 +64,9 @@ app.put('/todos/:id', async (req, res) => {
     if (!updatedTodo) return res.status(404).json({ error: 'Todo not found' });
     res.json(updatedTodo);
   } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
     res.status(400).json({ error: err.message });
   }
 });
@@ -72,6 +78,9 @@ app.delete('/todos/:id', async (req, res) => {
     if (!deletedTodo) return res.status(404).json({ error: 'Todo not found' });
     res.json({ message: 'Todo deleted successfully' });
   } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(404).json({ error: 'Todo not found' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
