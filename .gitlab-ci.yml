@@ -19,4 +19,4 @@ build:
   name: "node-dependencies-$CI_COMMIT_SHORT_SHA"
   paths: 
    - node_modules/
-  expires_in: 1 hour
+  expire_in: 1 hour
