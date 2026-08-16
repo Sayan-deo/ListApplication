@@ -36,11 +36,11 @@ Lint:
  image: $IMAGE
 
  cache:
- key:
-  files:
-   - package-lock.json
- paths:
-  - .npm/
+  key:
+   files:
+    - package-lock.json
+  paths:
+   - .npm/
  
  script:
   - npm ci --cache .npm --prefer-offline
